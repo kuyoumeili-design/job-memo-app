@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phrase Book</title>
+<style>
+:root{
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --text:#222;
+  --sub:#6b7280;
+  --line:#e5e7eb;
+  --main:#4CAF50;
+  --main-dark:#3e8e41;
+  --ng:#e74c3c;
+  --accent:#3b82f6;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.container{
+  max-width:640px;
+  margin:0 auto;
+  padding:16px;
+}
+h1{
+  text-align:center;
+  font-size:24px;
+  margin:12px 0 4px;
+}
+.total{
+  text-align:center;
+  color:var(--sub);
+  font-size:14px;
+  margin-bottom:16px;
+}
+
+/* タブ */
+.tabs{
+  display:flex;
+  gap:4px;
+  background:var(--card);
+  padding:4px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.06);
+  margin-bottom:16px;
+}
+.tabs button{
+  flex:1;
+  padding:10px 4px;
+  border:none;
+  background:none;
+  border-radius:8px;
+  font-size:14px;
+  color:var(--sub);
+  cursor:pointer;
+}
+.tabs button.active{
+  background:var(--main);
+  color:white;
+  font-weight:bold;
+}
+
+.panel{
+  background:var(--card);
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 0 10px rgba(0,0,0,0.06);
+}
+.hidden{display:none !important;}
+
+/* ボタン */
+.btn{
+  padding:12px 16px;
+  border:none;
+  border-radius:8px;
+  font-size:15px;
+  color:white;
+  background:var(--main);
+  cursor:pointer;
+}
+.btn:hover{background:var(--main-dark);}
+.btn.ng{background:var(--ng);}
+.btn.sub{background:#9ca3af;}
+.btn.small{padding:6px 10px;font-size:13px;}
+.btn.blue{background:var(--accent);}
+
+/* 練習モード選択 */
+.modes{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.modes .btn{
+  text-align:left;
+  font-size:16px;
+}
+.modes .btn span{
+  display:block;
+  font-size:12px;
+  opacity:0.85;
+  margin-top:2px;
+}
+
+/* カード */
+.progress{
+  text-align:center;
+  color:var(--sub);
+  font-size:13px;
+  margin-bottom:10px;
+}
+.flashcard{
+  min-height:220px;
+  border:2px solid var(--line);
+  border-radius:12px;
+  padding:24px 16px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+}
+.flashcard .phrase{
+  font-size:22px;
+  font-weight:bold;
+}
+.flashcard .example{
+  font-size:18px;
+  margin-top:16px;
+  line-height:1.5;
+}
+.flashcard .meaning{
+  font-size:14px;
+  color:var(--sub);
+  margin-top:8px;
+}
+.flashcard .hint{
+  font-size:12px;
+  color:var(--sub);
+  margin-top:20px;
+}
+.card-info{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  color:var(--sub);
+  margin-top:10px;
+}
+.answer-btns{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+.answer-btns .btn{flex:1;font-size:16px;}
+.session-foot{
+  display:flex;
+  justify-content:space-between;
+  margin-top:14px;
+}
+
+/* 入力フォーム */
+.form{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:20px;
+}
+.form input, .form textarea{
+  padding:10px;
+  font-size:16px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  font-family:inherit;
+}
+.form textarea{resize:vertical;min-height:60px;}
+.form-btns{display:flex;gap:8px;}
+.form-btns .btn{flex:1;}
+
+/* 一覧 */
+.list{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+.list li{
+  border-top:1px solid var(--line);
+  padding:12px 0;
+}
+.list .p{font-weight:bold;}
+.list .e{font-size:14px;margin-top:4px;}
+.list .m{font-size:13px;color:var(--sub);}
+.list .meta{
+  font-size:12px;
+  color:var(--sub);
+  margin-top:6px;
+}
+.list .row-btns{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+.bar{
+  height:6px;
+  background:var(--line);
+  border-radius:3px;
+  overflow:hidden;
+  margin-top:4px;
+}
+.bar div{
+  height:100%;
+  background:var(--main);
+}
+.empty{
+  text-align:center;
+  color:var(--sub);
+  padding:20px 0;
+}
+.section-title{
+  font-size:16px;
+  margin:0 0 10px;
+}
+.danger-zone{
+  margin-top:24px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>📘 Phrase Book</h1>
+  <div class="total" id="totalInfo"></div>
+
+  <div class="tabs">
+    <button data-tab="practice" class="active">練習</button>
+    <button data-tab="list">フレーズ帳</button>
+    <button data-tab="mastered">覚えた</button>
+  </div>
+
+  <!-- 練習タブ -->
+  <div class="panel" id="tab-practice">
+
+    <div id="modeSelect">
+      <h2 class="section-title">練習のしかたを選ぶ</h2>
+      <div class="modes">
+        <button class="btn blue" data-mode="review">
+          🧠 今日の復習（<b id="dueCount">0</b>枚）
+          <span>1日後 → 3日後 → 1週間後 → 1ヶ月後 の間隔で出てきます</span>
+        </button>
+        <button class="btn" data-mode="order">
+          ➡️ 順番に練習
+          <span>登録した順に全部</span>
+        </button>
+        <button class="btn" data-mode="random">
+          🎲 ランダムに練習
+          <span>シャッフルして全部</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="session" class="hidden">
+      <div class="progress" id="progress"></div>
+      <div class="flashcard" id="flashcard"></div>
+      <div class="card-info">
+        <span id="cardCount"></span>
+        <span id="cardNext"></span>
+      </div>
+      <div class="answer-btns">
+        <button class="btn ng" id="ngBtn">😿 まだ</button>
+        <button class="btn" id="okBtn">😺 覚えてた</button>
+      </div>
+      <div class="session-foot">
+        <button class="btn small sub" id="quitBtn">やめる</button>
+        <button class="btn small blue" id="masterBtn">✅ 覚えた列へ移す</button>
+      </div>
+    </div>
+
+    <div id="sessionEnd" class="hidden" style="text-align:center;">
+      <p style="font-size:20px;">🎉 おつかれさま！</p>
+      <p id="endInfo"></p>
+      <button class="btn" id="backBtn">戻る</button>
+    </div>
+
+  </div>
+
+  <!-- フレーズ帳タブ -->
+  <div class="panel hidden" id="tab-list">
+
+    <div class="form">
+      <h2 class="section-title" id="formTitle">フレーズを追加</h2>
+      <input id="phraseInput" placeholder="フレーズ（表）例: be looking forward to ~ing">
+      <textarea id="exampleInput" placeholder="例文（裏）例: I'm looking forward to seeing you."></textarea>
+      <input id="meaningInput" placeholder="日本語の意味（なくてもOK）">
+      <div class="form-btns">
+        <button class="btn hidden sub" id="cancelEditBtn">キャンセル</button>
+        <button class="btn" id="saveBtn">追加</button>
+      </div>
+    </div>
+
+    <ul class="list" id="phraseList"></ul>
+
+    <div class="danger-zone">
+      <button class="btn small sub" id="resetAllBtn">勉強記録を全部リセット</button>
+      <button class="btn small sub" id="exportBtn">バックアップを保存</button>
+      <button class="btn small sub" id="importBtn">バックアップを読み込む</button>
+      <input type="file" id="importFile" accept=".json" class="hidden">
+    </div>
+  </div>
+
+  <!-- 覚えたタブ -->
+  <div class="panel hidden" id="tab-mastered">
+    <ul class="list" id="masteredList"></ul>
+  </div>
+
+</div>
+
+<script>
+// ===== 設定 =====
+const MAX_COUNT = 30;                 // 1フレーズあたりの練習回数の上限
+const INTERVALS = [1, 3, 7, 30];      // 復習の間隔（日）
+const DAY = 24 * 60 * 60 * 1000;
+const STORAGE_KEY = "phraseBook";
+
+// ===== データの保存と読み込み =====
+let phrases = load();
+
+function load(){
+  try{
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  }catch(e){
+    return [];
+  }
+}
+
+function save(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(phrases));
+  }catch(e){}
+}
+
+// ===== ちょっとした道具 =====
+function startOfToday(){
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+// 次の復習日（日付単位。時刻は気にしない）
+function daysFromToday(days){
+  return startOfToday() + days * DAY;
+}
+
+function isDue(p){
+  return !p.mastered && p.due <= startOfToday();
+}
+
+function nextText(p){
+  if(p.mastered) return "覚えた！";
+  const diff = Math.round((p.due - startOfToday()) / DAY);
+  if(diff <= 0) return "今日復習";
+  if(diff === 1) return "明日復習";
+  return diff + "日後に復習";
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function el(tag, className, text){
+  const e = document.createElement(tag);
+  if(className) e.className = className;
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+
+// ===== タブ切り替え =====
+const tabButtons = document.querySelectorAll(".tabs button");
+
+tabButtons.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    showTab(btn.dataset.tab);
+  });
+});
+
+function showTab(name){
+  tabButtons.forEach(function(b){
+    b.classList.toggle("active", b.dataset.tab === name);
+  });
+  ["practice", "list", "mastered"].forEach(function(t){
+    document.getElementById("tab-" + t).classList.toggle("hidden", t !== name);
+  });
+  render();
+}
+
+// ===== 画面の更新 =====
+function render(){
+  const total = phrases.reduce(function(sum, p){ return sum + p.count; }, 0);
+  const masteredNum = phrases.filter(function(p){ return p.mastered; }).length;
+  document.getElementById("totalInfo").textContent =
+    "練習トータル " + total + "回 ・ フレーズ " + phrases.length + "個 ・ 覚えた " + masteredNum + "個";
+
+  document.getElementById("dueCount").textContent = phrases.filter(isDue).length;
+
+  renderList();
+  renderMastered();
+}
+
+function countBar(p){
+  const bar = el("div", "bar");
+  const fill = el("div");
+  fill.style.width = (p.count / MAX_COUNT * 100) + "%";
+  bar.appendChild(fill);
+  return bar;
+}
+
+function phraseItem(p){
+  const li = el("li");
+  li.appendChild(el("div", "p", p.phrase));
+  if(p.example) li.appendChild(el("div", "e", p.example));
+  if(p.meaning) li.appendChild(el("div", "m", p.meaning));
+  li.appendChild(el("div", "meta", "練習 " + p.count + " / " + MAX_COUNT + "回 ・ " + nextText(p)));
+  li.appendChild(countBar(p));
+  return li;
+}
+
+function renderList(){
+  const list = document.getElementById("phraseList");
+  list.innerHTML = "";
+
+  const active = phrases.filter(function(p){ return !p.mastered; });
+
+  if(active.length === 0){
+    list.appendChild(el("li", "empty", "まだフレーズがありません。上から追加してね"));
+    return;
+  }
+
+  active.forEach(function(p){
+    const li = phraseItem(p);
+    const btns = el("div", "row-btns");
+
+    const editBtn = el("button", "btn small blue", "編集");
+    editBtn.onclick = function(){ startEdit(p.id); };
+
+    const masterBtn = el("button", "btn small", "覚えた列へ");
+    masterBtn.onclick = function(){ setMastered(p.id, true); };
+
+    const resetBtn = el("button", "btn small sub", "記録リセット");
+    resetBtn.onclick = function(){
+      if(confirm("「" + p.phrase + "」の練習回数と復習日をリセットしますか？")){
+        resetRecord(p);
+        save();
+        render();
+      }
+    };
+
+    const delBtn = el("button", "btn small ng", "削除");
+    delBtn.onclick = function(){
+      if(confirm("「" + p.phrase + "」を削除しますか？")){
+        phrases = phrases.filter(function(x){ return x.id !== p.id; });
+        save();
+        render();
+      }
+    };
+
+    btns.append(editBtn, masterBtn, resetBtn, delBtn);
+    li.appendChild(btns);
+    list.appendChild(li);
+  });
+}
+
+function renderMastered(){
+  const list = document.getElementById("masteredList");
+  list.innerHTML = "";
+
+  const mastered = phrases.filter(function(p){ return p.mastered; });
+
+  if(mastered.length === 0){
+    list.appendChild(el("li", "empty", "覚えきったフレーズはここに移動します"));
+    return;
+  }
+
+  mastered.forEach(function(p){
+    const li = phraseItem(p);
+    const btns = el("div", "row-btns");
+
+    const backBtn = el("button", "btn small blue", "練習に戻す");
+    backBtn.onclick = function(){ setMastered(p.id, false); };
+
+    btns.appendChild(backBtn);
+    li.appendChild(btns);
+    list.appendChild(li);
+  });
+}
+
+// ===== フレーズの追加・編集 =====
+const phraseInput = document.getElementById("phraseInput");
+const exampleInput = document.getElementById("exampleInput");
+const meaningInput = document.getElementById("meaningInput");
+const saveBtn = document.getElementById("saveBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+let editingId = null;
+
+saveBtn.addEventListener("click", function(){
+  const phrase = phraseInput.value.trim();
+  const example = exampleInput.value.trim();
+  const meaning = meaningInput.value.trim();
+
+  if(phrase === ""){
+    phraseInput.focus();
+    return;
+  }
+
+  if(editingId){
+    const p = phrases.find(function(x){ return x.id === editingId; });
+    if(p){
+      p.phrase = phrase;
+      p.example = example;
+      p.meaning = meaning;
+    }
+  }else{
+    phrases.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      phrase: phrase,
+      example: example,
+      meaning: meaning,
+      count: 0,          // 練習した回数（最大30）
+      stage: 0,          // 復習の段階（0:まだ 1:1日後 2:3日後 3:1週間後 4:1ヶ月後）
+      due: startOfToday(),
+      mastered: false
+    });
+  }
+
+  save();
+  endEdit();
+  render();
+  phraseInput.focus();
+});
+
+phraseInput.addEventListener("keydown", function(event){
+  if(event.key === "Enter" && !event.isComposing){
+    exampleInput.focus();
+  }
+});
+
+function startEdit(id){
+  const p = phrases.find(function(x){ return x.id === id; });
+  if(!p) return;
+  editingId = id;
+  phraseInput.value = p.phrase;
+  exampleInput.value = p.example;
+  meaningInput.value = p.meaning;
+  document.getElementById("formTitle").textContent = "フレーズを編集";
+  saveBtn.textContent = "保存";
+  cancelEditBtn.classList.remove("hidden");
+  window.scrollTo(0, 0);
+  phraseInput.focus();
+}
+
+function endEdit(){
+  editingId = null;
+  phraseInput.value = "";
+  exampleInput.value = "";
+  meaningInput.value = "";
+  document.getElementById("formTitle").textContent = "フレーズを追加";
+  saveBtn.textContent = "追加";
+  cancelEditBtn.classList.add("hidden");
+}
+
+cancelEditBtn.addEventListener("click", endEdit);
+
+// ===== 記録まわり =====
+function resetRecord(p){
+  p.count = 0;
+  p.stage = 0;
+  p.due = startOfToday();
+}
+
+function setMastered(id, value){
+  const p = phrases.find(function(x){ return x.id === id; });
+  if(!p) return;
+  p.mastered = value;
+  if(!value){
+    p.due = startOfToday();
+  }
+  save();
+  render();
+}
+
+document.getElementById("resetAllBtn").addEventListener("click", function(){
+  if(confirm("全部のフレーズの練習回数と復習日をリセットしますか？（フレーズ自体は消えません）")){
+    phrases.forEach(resetRecord);
+    save();
+    render();
+  }
+});
+
+// ===== バックアップ =====
+document.getElementById("exportBtn").addEventListener("click", function(){
+  const blob = new Blob([JSON.stringify(phrases, null, 2)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "phrase-book-backup.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+const importFile = document.getElementById("importFile");
+
+document.getElementById("importBtn").addEventListener("click", function(){
+  importFile.click();
+});
+
+importFile.addEventListener("change", function(){
+  const file = importFile.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    try{
+      const data = JSON.parse(reader.result);
+      if(!Array.isArray(data)) throw new Error();
+      if(confirm("今のデータをバックアップの内容で置きかえますか？")){
+        phrases = data;
+        save();
+        render();
+      }
+    }catch(e){
+      alert("このファイルは読み込めませんでした");
+    }
+    importFile.value = "";
+  };
+  reader.readAsText(file);
+});
+
+// ===== 練習 =====
+const modeSelect = document.getElementById("modeSelect");
+const sessionBox = document.getElementById("session");
+const sessionEnd = document.getElementById("sessionEnd");
+const flashcard = document.getElementById("flashcard");
+
+let queue = [];       // 今回練習するフレーズのid
+let index = 0;
+let flipped = false;
+let doneNum = 0;
+
+document.querySelectorAll(".modes .btn").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    startSession(btn.dataset.mode);
+  });
+});
+
+function startSession(mode){
+  let cards = phrases.filter(function(p){ return !p.mastered; });
+
+  if(mode === "review"){
+    cards = cards.filter(isDue);
+  }
+  if(mode === "random"){
+    cards = shuffle(cards);
+  }
+
+  if(cards.length === 0){
+    alert(mode === "review"
+      ? "今日復習するフレーズはありません 😺"
+      : "練習するフレーズがありません。フレーズ帳タブから追加してね");
+    return;
+  }
+
+  queue = cards.map(function(p){ return p.id; });
+  index = 0;
+  doneNum = 0;
+  modeSelect.classList.add("hidden");
+  sessionEnd.classList.add("hidden");
+  sessionBox.classList.remove("hidden");
+  showCard();
+}
+
+function currentCard(){
+  return phrases.find(function(p){ return p.id === queue[index]; });
+}
+
+function showCard(){
+  const p = currentCard();
+  if(!p){
+    endSession();
+    return;
+  }
+
+  flipped = false;
+  document.getElementById("progress").textContent = (index + 1) + " / " + queue.length;
+  drawCard(p);
+  updateCardInfo(p);
+}
+
+function drawCard(p){
+  flashcard.innerHTML = "";
+  flashcard.appendChild(el("div", "phrase", p.phrase));
+
+  if(flipped){
+    flashcard.appendChild(el("div", "example", p.example || "（例文なし）"));
+    if(p.meaning) flashcard.appendChild(el("div", "meaning", p.meaning));
+  }else{
+    flashcard.appendChild(el("div", "hint", "タップして例文を見る"));
+  }
+}
+
+function updateCardInfo(p){
+  document.getElementById("cardCount").textContent = "練習 " + p.count + " / " + MAX_COUNT + "回";
+  document.getElementById("cardNext").textContent = nextText(p);
+}
+
+flashcard.addEventListener("click", function(){
+  const p = currentCard();
+  if(!p) return;
+  flipped = !flipped;
+  drawCard(p);
+});
+
+function answer(remembered){
+  const p = currentCard();
+  if(!p) return;
+
+  // 練習回数（上限30）
+  if(p.count < MAX_COUNT){
+    p.count++;
+  }
+
+  // 復習の予定
+  if(remembered){
+    // 復習日が来ていないカードを先取りで練習しても、間隔は進めない
+    if(isDue(p)){
+      const days = INTERVALS[Math.min(p.stage, INTERVALS.length - 1)];
+      p.stage = Math.min(p.stage + 1, INTERVALS.length);
+      p.due = daysFromToday(days);
+    }
+  }else{
+    // 忘れていたら最初（1日後）からやり直し
+    p.stage = 1;
+    p.due = daysFromToday(INTERVALS[0]);
+  }
+
+  save();
+  render();
+  doneNum++;
+  index++;
+  showCard();
+}
+
+document.getElementById("okBtn").addEventListener("click", function(){ answer(true); });
+document.getElementById("ngBtn").addEventListener("click", function(){ answer(false); });
+
+document.getElementById("masterBtn").addEventListener("click", function(){
+  const p = currentCard();
+  if(!p) return;
+  setMastered(p.id, true);
+  index++;
+  showCard();
+});
+
+document.getElementById("quitBtn").addEventListener("click", endSession);
+document.getElementById("backBtn").addEventListener("click", backToModes);
+
+function endSession(){
+  sessionBox.classList.add("hidden");
+  if(doneNum > 0){
+    document.getElementById("endInfo").textContent = "今回 " + doneNum + "枚 練習しました";
+    sessionEnd.classList.remove("hidden");
+  }else{
+    backToModes();
+  }
+}
+
+function backToModes(){
+  sessionEnd.classList.add("hidden");
+  sessionBox.classList.add("hidden");
+  modeSelect.classList.remove("hidden");
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
